@@ -4,26 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tweet extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'tweet',
     ];
 
     /**
-     * Get the user that owns the tweet.
+     * このツイートを投稿したユーザーを取得 (1対多)
      */
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * このツイートを「いいね」したユーザーを取得 (多対多)
+     */
+    public function liked()
+    {
+        return $this->belongsToMany(User::class)->withTimestamps();
+    }
 }
+

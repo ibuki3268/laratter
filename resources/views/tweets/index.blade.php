@@ -1,7 +1,7 @@
 <x-app-layout>
   <x-slot name="header">
     <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-      {{ __('Tweetˆê——') }}
+      {{ __('Tweetä¸€è¦§') }}
     </h2>
   </x-slot>
 
@@ -12,8 +12,24 @@
           @foreach ($tweets as $tweet)
           <div class="mb-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
             <p class="text-gray-800 dark:text-gray-300">{{ $tweet->tweet }}</p>
-            <p class="text-gray-600 dark:text-gray-400 text-sm">“ŠeÒ: {{ $tweet->user->name }}</p>
-            <a href="{{ route('tweets.show', $tweet) }}" class="text-blue-500 hover:text-blue-700">Ú×‚ğŒ©‚é</a>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">æŠ•ç¨¿è€…: {{ $tweet->user->name }}</p>
+            <a href="{{ route('tweets.show', $tweet) }}" class="text-blue-500 hover:text-blue-700">è©³ç´°ã‚’è¦‹ã‚‹</a>
+            {{-- ğŸ”½ è¿½åŠ  --}}
+            <div class="flex">
+              @if ($tweet->liked->contains(auth()->id()))
+              <form action="{{ route('tweets.dislike', $tweet) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="text-red-500 hover:text-red-700">dislike {{$tweet->liked->count()}}</button>
+              </form>
+              @else
+              <form action="{{ route('tweets.like', $tweet) }}" method="POST">
+                @csrf
+                <button type="submit" class="text-blue-500 hover:text-blue-700">like {{$tweet->liked->count()}}</button>
+              </form>
+              @endif
+            </div>
+            {{-- ğŸ”¼ ã“ã“ã¾ã§ --}}
           </div>
           @endforeach
         </div>

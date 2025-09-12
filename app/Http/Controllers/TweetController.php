@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http-Controllers;
+namespace App\Http\Controllers;
 
 use App\Models\Tweet;
 use Illuminate\Http\Request;
@@ -10,11 +10,12 @@ class TweetController extends Controller
     /**
      * ツイートの一覧表示
      */
-    public function index()
-    {
-        $tweets = Tweet::with('user')->latest()->get();
-        return view('tweets.index', compact('tweets'));
-    }
+public function index()
+{
+    // ? 'user' と 'liked' の情報を一緒に取得するように修正
+    $tweets = Tweet::with(['user', 'liked'])->latest()->get();
+    return view('tweets.index', compact('tweets'));
+}
 
     /**
      * ツイートの新規作成画面
@@ -24,9 +25,7 @@ class TweetController extends Controller
         return view('tweets.create');
     }
 
-    /**
-     * ツイートの保存処理
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -43,7 +42,42 @@ class TweetController extends Controller
      */
     public function show(Tweet $tweet)
     {
-        // ? 追加したメソッド
         return view('tweets.show', compact('tweet'));
     }
+
+    /**
+     * ツイートの編集画面
+     */
+    public function edit(Tweet $tweet)
+    {
+        return view('tweets.edit', compact('tweet'));
+    }
+
+    /**
+     * ツイートの更新処理
+     */
+    public function update(Request $request, Tweet $tweet)
+    {
+        $request->validate([
+            'tweet' => 'required|max:255',
+        ]);
+
+        $tweet->update($request->only('tweet'));
+
+        // 更新後は、そのツイートの詳細画面に戻る
+        return redirect()->route('tweets.show', $tweet);
+    }
+
+    /**
+     * ツイートの削除処理
+     */
+    public function destroy(Tweet $tweet)
+    {
+        $tweet->delete();
+
+        return redirect()->route('tweets.index');
+    }
+
+
 }
+

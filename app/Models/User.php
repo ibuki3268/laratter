@@ -6,7 +6,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -47,11 +46,18 @@ class User extends Authenticatable
     }
 
     /**
-     * ユーザーが所有するツイートを取得する
+     * ユーザーが投稿したツイートを取得 (1対多)
      */
-    public function tweets(): HasMany
+    public function tweets()
     {
         return $this->hasMany(Tweet::class);
     }
-}
 
+    /**
+     * ユーザーが「いいね」したツイートを取得 (多対多)
+     */
+    public function likes()
+    {
+        return $this->belongsToMany(Tweet::class)->withTimestamps();
+    }
+}
