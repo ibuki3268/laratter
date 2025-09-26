@@ -60,6 +60,11 @@ public function index()
         // 更新後は、そのツイートの詳細画面に戻る
         return redirect()->route('tweets.show', $tweet);
     }
+   public function show(Tweet $tweet)
+{
+  $tweet->load('comments');
+  return view('tweets.show', compact('tweet'));
+}
 
     /**
      * ツイートの削除処理
@@ -71,13 +76,31 @@ public function index()
         return redirect()->route('tweets.index');
     }
 
-
-    public function show(Tweet $tweet)
+/**
+ * Search for tweets containing the keyword.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @return \Illuminate\View\View
+ */
+public function search(Request $request)
 {
-  $tweet->load('comments');
-  return view('tweets.show', compact('tweet'));
-}
 
+  $query = Tweet::query();
+
+  // キーワードが指定されている場合のみ検索を実行
+  if ($request->filled('keyword')) {
+    $keyword = $request->keyword;
+    $query->where('tweet', 'like', '%' . $keyword . '%');
+  }
+
+  // ページネーションを追加（1ページに10件表示）
+  $tweets = $query
+    ->latest()
+    ->paginate(10);
+
+  return view('tweets.search', compact('tweets'));
+}
+ 
 
 }
 
