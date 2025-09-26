@@ -1,0 +1,137 @@
+<?php
+
+use App\Models\Tweet;
+use App\Models\User;
+
+// 作成画面のテスト
+test('displays the create tweet page', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $response = $this->get(route('tweets.create'));
+    $response->assertStatus(200);
+});
+
+// 一覧取得のテスト
+test('displays tweets', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $tweet = Tweet::factory()->create(['user_id' => $user->id]);
+    $response = $this->get(route('tweets.index'));
+    $response->assertStatus(200);
+    $response->assertSee($tweet->tweet);
+    $response->assertSee($tweet->user->name);
+});
+
+// 作成処理のテスト
+test('allows authenticated users to create a tweet', function () {
+    // ユーザを作成
+    $user = User::factory()->create();
+
+    // ユーザを認証
+    $this->actingAs($user);
+
+    // Tweetを作成
+    $tweetData = ['tweet' => 'This is a test tweet.'];
+
+    // POSTリクエスト
+    $response = $this->post(route('tweets.store'), $tweetData);
+
+    // データベースに保存されたことを確認
+    $this->assertDatabaseHas('tweets', $tweetData);
+
+    // レスポンスの確認
+    $response->assertStatus(302);
+    $response->assertRedirect(route('tweets.index'));
+});
+
+// 詳細画面のテスト
+test('displays a tweet', function () {
+    // ユーザを作成
+    $user = User::factory()->create();
+
+    // ユーザを認証
+    $this->actingAs($user);
+
+    // Tweetを作成
+    $tweet = Tweet::factory()->create(['user_id' => $user->id]);
+
+    // GETリクエスト
+    $response = $this->get(route('tweets.show', $tweet));
+
+    // レスポンスにTweetの内容が含まれていることを確認
+    $response->assertStatus(200);
+    $response->assertSee($tweet->tweet);
+    $response->assertSee($tweet->created_at->format('Y-m-d H:i'));
+    $response->assertSee($tweet->updated_at->format('Y-m-d H:i'));
+    $response->assertSee($tweet->user->name);
+});
+
+// 編集画面のテスト
+test('displays the edit tweet page', function () {
+    // テスト用のユーザーを作成
+    $user = User::factory()->create();
+
+    // ユーザーを認証（ログイン）
+    $this->actingAs($user);
+
+    // Tweetを作成
+    $tweet = Tweet::factory()->create(['user_id' => $user->id]);
+
+    // 編集画面にアクセス
+    $response = $this->get(route('tweets.edit', $tweet));
+
+    // ステータスコードが200であることを確認
+    $response->assertStatus(200);
+
+    // ビューにTweetの内容が含まれていることを確認
+    $response->assertSee($tweet->tweet);
+});
+
+// 更新処理のテスト
+test('allows a user to update their tweet', function () {
+    // ユーザを作成
+    $user = User::factory()->create();
+
+    // ユーザを認証
+    $this->actingAs($user);
+
+    // Tweetを作成
+    $tweet = Tweet::factory()->create(['user_id' => $user->id]);
+
+    // 更新データ
+    $updatedData = ['tweet' => 'Updated tweet content.'];
+
+    // PUTリクエスト
+    $response = $this->put(route('tweets.update', $tweet), $updatedData);
+
+    // データベースが更新されたことを確認
+    $this->assertDatabaseHas('tweets', ['id' => $tweet->id] + $updatedData);
+
+    // レスポンスの確認
+    $response->assertStatus(302);
+    $response->assertRedirect(route('tweets.show', $tweet));
+});
+
+// ? ここからが、あなたの指示通りに追加した部分です
+// 削除処理のテスト
+test('allows a user to delete their tweet', function () {
+    // ユーザを作成
+    $user = User::factory()->create();
+
+    // ユーザを認証
+    $this->actingAs($user);
+
+    // Tweetを作成
+    $tweet = Tweet::factory()->create(['user_id' => $user->id]);
+
+    // DELETEリクエスト
+    $response = $this->delete(route('tweets.destroy', $tweet));
+
+    // データベースから削除されたことを確認
+    $this->assertDatabaseMissing('tweets', ['id' => $tweet->id]);
+
+    // レスポンスの確認
+    $response->assertStatus(302);
+    $response->assertRedirect(route('tweets.index'));
+});
+
