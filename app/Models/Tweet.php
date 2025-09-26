@@ -14,7 +14,7 @@ class Tweet extends Model
     ];
 
     /**
-     * このツイートを投稿したユーザーを取得 (1対多)
+     * このツイートを投稿したユーザーを取得 (所属)
      */
     public function user()
     {
@@ -28,5 +28,10 @@ class Tweet extends Model
     {
         return $this->belongsToMany(User::class)->withTimestamps();
     }
+ 
+    // 🔽 お客様からご指示いただいたコードブロック
+    public function comments()
+    {
+        return $this->hasMany(\App\Models\Comment::class)->orderBy('created_at', 'desc');
+    }
 }
-

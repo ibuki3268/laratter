@@ -37,13 +37,6 @@ public function index()
         return redirect()->route('tweets.index');
     }
 
-    /**
-     * ツイートの詳細表示
-     */
-    public function show(Tweet $tweet)
-    {
-        return view('tweets.show', compact('tweet'));
-    }
 
     /**
      * ツイートの編集画面
@@ -77,6 +70,13 @@ public function index()
 
         return redirect()->route('tweets.index');
     }
+
+
+    public function show(Tweet $tweet)
+{
+  $tweet->load('comments');
+  return view('tweets.show', compact('tweet'));
+}
 
 
 }
