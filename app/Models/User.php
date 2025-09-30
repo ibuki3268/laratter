@@ -75,4 +75,12 @@ class User extends Authenticatable
   {
     return $this->belongsToMany(User::class, 'follows', 'follower_id', 'follow_id');
   }
+
+    /**
+     * このユーザーがブックマークしたツイートを取得 (多対多)
+     */
+    public function bookmarks()
+    {
+        return $this->belongsToMany(\App\Models\Tweet::class, 'bookmarks')->withTimestamps();
+    }
 }

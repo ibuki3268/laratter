@@ -19,7 +19,7 @@
             {{-- 🔼 ここまで --}}
             <a href="{{ route('tweets.show', $tweet) }}" class="text-blue-500 hover:text-blue-700">詳細を見る</a>
             
-            <div class="flex">
+            <div class="flex items-center space-x-4">
               @if ($tweet->liked->contains(auth()->id()))
               <form action="{{ route('tweets.dislike', $tweet) }}" method="POST">
                 @csrf
@@ -32,6 +32,23 @@
                 <button type="submit" class="text-blue-500 hover:text-blue-700">like {{$tweet->liked->count()}}</button>
               </form>
               @endif
+
+              {{-- ▼ ブックマークボタン ▼ --}}
+              @if($tweet->isBookmarkedBy(Auth::user()))
+                  {{-- ブックマーク済みの場合：解除ボタン --}}
+                  <form action="{{ route('bookmarks.destroy', $tweet) }}" method="POST">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="text-yellow-500 hover:text-yellow-700">ブックマーク解除</button>
+                  </form>
+              @else
+                  {{-- 未ブックマークの場合：追加ボタン --}}
+                  <form action="{{ route('bookmarks.store', $tweet) }}" method="POST">
+                      @csrf
+                      <button type="submit" class="text-gray-500 hover:text-gray-700">ブックマーク</button>
+                  </form>
+              @endif
+              {{-- ▲ ブックマークボタン ▲ --}}
             </div>
             
           </div>
@@ -40,5 +57,4 @@
       </div>
     </div>
   </div>
-
 </x-app-layout>
