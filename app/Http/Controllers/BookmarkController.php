@@ -11,7 +11,7 @@ class BookmarkController extends Controller
     public function index()
     {
         $bookmarkedTweets = Auth::user()->bookmarks()->latest()->paginate(15);
-        return view('bookmarks.index', ['tweets' => $bookmarkedTweets]);
+        return view('tweets.bookmarks', ['tweets' => $bookmarkedTweets]);
     }
 
     public function store(Tweet $tweet)
